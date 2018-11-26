@@ -1,0 +1,6 @@
+{
+  "Nest": {
+    "AccessToken": "",
+    "PollingPeriodSeconds": 60
+  }
+}

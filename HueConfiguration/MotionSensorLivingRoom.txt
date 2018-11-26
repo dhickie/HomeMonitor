@@ -1,0 +1,194 @@
+1. New generic sensor:
+POST: /api/<username>/sensors
+{
+    "state": {
+        "flag": false
+    },
+    "name": "Living room cool down sensor",
+    "modelid": "LivingRoomFlagSensor",
+    "swversion": "1.0",
+    "type": "CLIPGenericFlag",
+    "uniqueid": "4e7b72e8-bde3-4e37-b04e-f46487b7d0e0",
+    "manufacturername": "EDom Inc."
+}
+
+2. New rule - Set lights to "Relax" scene if after sundown, lights off, flag false and motion detected:
+{
+  "name": "Living room motion - evening on",
+  "conditions": [
+    {
+      "address": "/sensors/1/state/daylight",
+      "operator": "eq",
+      "value": "false"
+    },
+	{
+      "address": "/groups/1/state/any_on",
+      "operator": "eq",
+      "value": "false"
+    },
+	{
+      "address": "/sensors/9/state/flag",
+      "operator": "eq",
+      "value": "false"
+    },
+	{
+      "address": "/sensors/6/state/presence",
+      "operator": "eq",
+	  "value": "true"
+    },
+	{
+      "address": "/sensors/6/state/presence",
+      "operator": "dx"
+    }
+  ],
+  "actions": [
+    {
+      "address": "/groups/1/action",
+      "method": "PUT",
+      "body": {
+        "scene": "s80DH1vj4fYn8sV"
+      }
+    }
+  ]
+}
+
+3. New rule - Set lights to "Daylight" if before sundown, lights off, flag false, light sensor dark, movement detected:
+{
+  "name": "Living motion sensor - day on",
+  "conditions": [
+    {
+      "address": "/sensors/1/state/daylight",
+      "operator": "eq",
+      "value": "true"
+    },
+	{
+      "address": "/groups/1/state/any_on",
+      "operator": "eq",
+      "value": "false"
+    },
+	{
+      "address": "/sensors/9/state/flag",
+      "operator": "eq",
+      "value": "false"
+    },
+	{
+      "address": "/sensors/7/state/dark",
+      "operator": "eq",
+      "value": "true"
+    },
+	{
+      "address": "/sensors/6/state/presence",
+      "operator": "eq",
+	  "value": "true"
+    },
+	{
+      "address": "/sensors/6/state/presence",
+      "operator": "dx"
+    }
+  ],
+  "actions": [
+    {
+      "address": "/groups/1/action",
+      "method": "PUT",
+      "body": {
+        "scene": "-kgUCS9Ozwmj9EZ"
+      }
+    }
+  ]
+}
+
+4. New rule - Set lights to "Daylight" if before sundown, lights off, flag false, movement true and light goes dark
+{
+  "name": "Living motion sensor-day darkon",
+  "conditions": [
+    {
+      "address": "/sensors/1/state/daylight",
+      "operator": "eq",
+      "value": "true"
+    },
+	{
+      "address": "/groups/1/state/any_on",
+      "operator": "eq",
+      "value": "false"
+    },
+	{
+      "address": "/sensors/9/state/flag",
+      "operator": "eq",
+      "value": "false"
+    },
+	{
+      "address": "/sensors/6/state/presence",
+      "operator": "eq",
+	  "value": "true"
+    },
+	{
+      "address": "/sensors/7/state/dark",
+      "operator": "eq",
+      "value": "true"
+    },
+	{
+      "address": "/sensors/7/state/dark",
+      "operator": "dx"
+    }
+  ],
+  "actions": [
+    {
+      "address": "/groups/1/action",
+      "method": "PUT",
+      "body": {
+        "scene": "-kgUCS9Ozwmj9EZ"
+      }
+    }
+  ]
+}
+
+5. New rule - Set flag to "true" when lights are turned off
+{
+  "name": "Living motion sensor - flag on",
+  "conditions": [
+    {
+      "address": "/groups/1/state/any_on",
+      "operator": "eq",
+      "value": "false"
+    },
+	{
+      "address": "/groups/1/state/any_on",
+      "operator": "dx"
+    }
+  ],
+  "actions": [
+    {
+      "address": "/sensors/9/state",
+      "method": "PUT",
+      "body": {
+        "flag": "true"
+      }
+    }
+  ]
+}
+
+6. New rule - Set flag to "false" 30s after being set to true
+{
+  "name": "Living motion sensor - flag off",
+  "conditions": [
+    {
+      "address": "/sensors/9/state/flag",
+      "operator": "eq",
+      "value": "true"
+    },
+	{
+      "address": "/sensors/9/state/flag",
+      "operator": "ddx",
+      "value": "PT00:00:30"
+    }
+  ],
+  "actions": [
+    {
+      "address": "/sensors/9/state",
+      "method": "PUT",
+      "body": {
+        "flag": "false"
+      }
+    }
+  ]
+}
